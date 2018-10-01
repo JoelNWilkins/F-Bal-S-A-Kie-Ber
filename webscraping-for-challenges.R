@@ -2,6 +2,7 @@ setwd("C:/Users/tompo/OneDrive/Documents/Tom Potter/General Programming/Cipher C
 
 library("rvest")
 
+# These are the year and challenge you'll be getting
 year <- "2015"
 challenge <- "1"
 
