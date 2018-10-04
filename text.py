@@ -12,7 +12,11 @@ class Text:
         else:
             self.__score = score.Chi_Squared(case=self.__case)
 
-        self.__set__(*args, **kwargs)
+        if "path" in kwargs.keys():
+            with open(kwargs.pop("path"), "r") as f:
+                self.__set__(f.read(), *args, **kwargs)
+        else:
+            self.__set__(*args, **kwargs)
 
     def __repr__(self):
         if len(self.__text) > 70:
