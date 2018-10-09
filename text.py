@@ -13,9 +13,11 @@ class Text:
             self.__score = score.Chi_Squared(case=self.__case)
 
         if "path" in kwargs.keys():
-            with open(kwargs.pop("path"), "r") as f:
+            self.__path == kwargs.pop("path")
+            with open(self.__path, "r") as f:
                 self.__set__(f.read(), *args, **kwargs)
         else:
+            self.__path = None
             self.__set__(*args, **kwargs)
 
     def __repr__(self):
@@ -33,7 +35,7 @@ class Text:
         if isinstance(key, int):
             return self.__text[key]
         elif isinstance(key, slice):
-            return (self.__text[key.start:key.stop]
+            return self.__text[key.start:key.stop]
 
     def __set__(self, *args, **kwargs):
         if len(args) == 1:
@@ -74,3 +76,12 @@ class Text:
 
     def reverse_words(self, sep=" "):
         self.__text = sep.join(["".join(list(reversed(word))) for word in self.__text.split(sep)])
+
+    def save(self, path=None):
+        if path != None:
+            self.__path = path
+        elif self.__path == None:
+            raise ValueError("no path specified")
+
+        with open(self.__path, "w") as f:
+            f.write(self.__str__())
