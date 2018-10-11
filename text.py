@@ -1,19 +1,21 @@
+import re
 import score
+import characters
 
 class Text:
     def __init__(self, *args, **kwargs):
-        if "case" in kwargs.keys():
-            self.__case = kwargs.pop("case").upper()
+        if "chars" in kwargs.keys():
+            self.__chars = kwargs.pop("chars")
         else:
-            self.__case = "NONE"
+            self.__chars = characters.uppercase
 
         if "score" in kwargs.keys():
             self.__score = kwargs.pop("score")
         else:
-            self.__score = score.Chi_Squared(case=self.__case)
+            self.__score = score.Chi_Squared(chars=self.__chars)
 
         if "path" in kwargs.keys():
-            self.__path == kwargs.pop("path")
+            self.__path = kwargs.pop("path")
             with open(self.__path, "r") as f:
                 self.__set__(f.read(), *args, **kwargs)
         else:
@@ -26,7 +28,7 @@ class Text:
         return "{}(\"{}\")".format(self.__class__.__name__, self.__text)
 
     def __str__(self):
-        return self.__text
+        return self.__temp.format(*list(self.__text))
 
     def __get__(self):
         return self.__text
@@ -40,11 +42,9 @@ class Text:
     def __set__(self, *args, **kwargs):
         if len(args) == 1:
             text = args[0]
-            if self.__case == "UPPER":
-                text = text.upper()
-            elif self.__case == "LOWER":
-                text = text.lower()
-            self.__text = "".join([char for char in text])
+            self.__text = self.__chars(text)
+            p = re.compile("[{}]".format(str(self.__chars)))
+            self.__temp = "{}".join(p.split(text))
         else:
             print(args, kwargs)
             raise ValueError("{} only takes one argument".format(self.__class__.__name__))
@@ -53,11 +53,13 @@ class Text:
         if isinstance(key, int):
             self.__text[key] = value
         elif isinstance(key, str):
+            text = list(self.__text)
             for i, char in enumerate(self.__text):
                 if char == key:
-                    self.__text[i] = value
+                    text[i] = value
                 elif char == value:
-                    self.__text[i] = key
+                    text[i] = key
+            self.__text = "".join(text)
 
     def __len__(self):
         return len(self.__text)
@@ -70,6 +72,9 @@ class Text:
 
     def copy(self):
         return Text(self.__text)
+
+    def shift(self, n):
+        self.__text = "".join([self.__chars[(self.__chars.index(char)+n)%len(self.__chars)] for char in self.__text])
 
     def reverse(self):
         self.__text = "".join(list(reversed(self.__text)))
