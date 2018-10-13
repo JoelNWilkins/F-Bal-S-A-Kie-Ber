@@ -1,92 +1,74 @@
 import re
-import score
-import characters
+import string
+import ngrams
 
 class Text:
     def __init__(self, *args, **kwargs):
         if "chars" in kwargs.keys():
             self.__chars = kwargs.pop("chars")
         else:
-            self.__chars = characters.uppercase
+            self.__chars = string.ascii_uppercase
 
-        if "score" in kwargs.keys():
-            self.__score = kwargs.pop("score")
+        if self.__chars == string.ascii_uppercase:
+            text = args[0].upper()
+        elif self.__chars == string.ascii_lowercase:
+            text = args[0].lower()
         else:
-            self.__score = score.Chi_Squared(chars=self.__chars)
+            text = args[0]
 
-        if "path" in kwargs.keys():
-            self.__path = kwargs.pop("path")
-            with open(self.__path, "r") as f:
-                self.__set__(f.read(), *args, **kwargs)
-        else:
-            self.__path = None
-            self.__set__(*args, **kwargs)
+        self.__text = [char for char in text if char in self.__chars]
+        p = re.compile("[{}]".format(self.__chars))
+        self.__temp = "{}".join(p.split(args[0]))
 
     def __repr__(self):
-        if len(self.__text) > 79:
-            return "{}(\"{}...\")".format(self.__class__.__name__, self.__text[:76])
-        return "{}(\"{}\")".format(self.__class__.__name__, self.__text)
+        return "".join(self.__text)
 
-    def __str__(self):
-        return self.__temp.format(*list(self.__text))
+    def __str__(self, *args, **kwargs):
+        return self.__temp.format(*self.__text)
 
     def __get__(self):
-        return self.__text
+        return self.__repr__()
 
     def __getitem__(self, key):
-        if isinstance(key, int):
-            return self.__text[key]
-        elif isinstance(key, slice):
-            return self.__text[key.start:key.stop]
-
-    def __set__(self, *args, **kwargs):
-        if len(args) == 1:
-            text = args[0]
-            self.__text = self.__chars(text)
-            p = re.compile("[{}]".format(str(self.__chars)))
-            self.__temp = "{}".join(p.split(text))
-        else:
-            print(args, kwargs)
-            raise ValueError("{} only takes one argument".format(self.__class__.__name__))
+        return self.__text[key]
 
     def __setitem__(self, key, value):
-        if isinstance(key, int):
-            self.__text[key] = value
-        elif isinstance(key, str):
-            text = list(self.__text)
-            for i, char in enumerate(self.__text):
+        if isinstance(key, str):
+            for i, char in self.__text:
                 if char == key:
-                    text[i] = value
+                    self.__text[i] = value
                 elif char == value:
-                    text[i] = key
-            self.__text = "".join(text)
+                    self.__text[i] = key
+        elif isinstance(key, int) or isinstance(key, slice):
+            self.__text[key] = value
+        else:
+            raise TypeError("invalid index of type '{}'".format(key.__class__.__name__))
 
     def __len__(self):
         return len(self.__text)
 
-    def swap(self, char1, char2):
-        self.__setitem__(char1, char2)
+    def __iter__(self):
+        self.__count = -1
+        self.__length = self.__len__()
+        return self
 
-    def score(self):
-        return self.__score.score(self.__text)
-
-    def copy(self):
-        return Text(self.__text)
-
-    def shift(self, n):
-        self.__text = "".join([self.__chars[(self.__chars.index(char)+n)%len(self.__chars)] for char in self.__text])
+    def __next__(self):
+        self.__count += 1
+        if self.__count < self.__length:
+            return self.__text[self.__count]
+        else:
+            raise StopIteration
 
     def reverse(self):
-        self.__text = "".join(list(reversed(self.__text)))
+        # can also call reversed method with a Text object as an argument
+        self.__text = list(reversed(self.__text))
 
     def reverse_words(self, sep=" "):
-        self.__text = sep.join(["".join(list(reversed(word))) for word in self.__text.split(sep)])
+        self.__text = sep.join(["".join(list(reversed(word))) for word in self.__repr__().split(sep)])
 
-    def save(self, path=None):
-        if path != None:
-            self.__path = path
-        elif self.__path == None:
-            raise ValueError("no path specified")
+    def shift(self, n):
+        self.__text = "".join([self.__chars[(self.__chars.index(char)+n) % len(self.__chars)]
+            for char in self.__text])
 
-        with open(self.__path, "w") as f:
-            f.write(self.__str__())
+    def ngrams(self, n):
+        return ngrams.NGrams(self.__repr__(), n)
