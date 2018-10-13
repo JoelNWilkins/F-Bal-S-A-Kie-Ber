@@ -1,7 +1,6 @@
 import os
 import pickle
 from collections import Counter
-import characters
 
 class Chi_Squared:
     def __init__(self, *args, **kwargs):

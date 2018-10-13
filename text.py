@@ -1,6 +1,11 @@
 import re
 import string
-import ngrams
+
+def ngrams(text, n):
+    if len(text) < n:
+        raise ValueError("the length of the text must be larger than n")
+    for i in range(len(text)-n+1):
+        yield text[i:i+n]
 
 class Text:
     def __init__(self, *args, **kwargs):
@@ -71,4 +76,4 @@ class Text:
             for char in self.__text])
 
     def ngrams(self, n):
-        return ngrams.NGrams(self.__repr__(), n)
+        return ngrams(self.__repr__(), n)
