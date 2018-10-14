@@ -4,7 +4,7 @@ from text import Text
 
 class Challenge:
     generic_url = "https://www.cipherchallenge.org/challenges/challenge-{}/"
-    
+
     def __init__(self, n):
         self.__n = n
         self.__url = self.generic_url.format(n)
@@ -29,11 +29,11 @@ class Challenge:
         return self.__url
 
     @property
-    def a(self):
+    def A(self):
         content = soup.find_all("div", attrs={"class": "challenge__content"})
         return Text(content[0].text.strip())
 
     @property
-    def b(self):
+    def B(self):
         content = soup.find_all("div", attrs={"class": "challenge__content"})
         return Text(content[1].text.strip())

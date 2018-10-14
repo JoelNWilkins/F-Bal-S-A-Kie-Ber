@@ -1,7 +1,6 @@
+import string
 import os
 import pickle
-import string
-import math
 from collections import Counter
 from text import ngrams
 

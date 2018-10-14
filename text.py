@@ -1,5 +1,5 @@
-import re
 import string
+import re
 
 def ngrams(text, n, overlap=True):
     if len(text) < n:
@@ -12,9 +12,12 @@ def ngrams(text, n, overlap=True):
             yield text[i*n:(i+1)*n]
 
 class Text:
-    def __init__(self, text, chars=string.ascii_uppercase, case="auto"):
+    def __init__(self, text=None, chars=string.ascii_uppercase, case="auto", path=None):
         self.__chars = chars
         self.__case = case.lower()
+
+        if path != None:
+            text = f.read()
 
         if self.__case == "auto":
             if self.__chars == string.ascii_uppercase:
@@ -91,6 +94,10 @@ class Text:
 
     def copy(self):
         return Text(self.__repr__())
+
+    def save(self, path):
+        with open(path, "w") as f:
+            f.write(self.__str__())
 
     @property
     def chars(self):
