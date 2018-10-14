@@ -83,8 +83,15 @@ class Text:
             for word in self.__repr__().split(sep)])
 
     def shift(self, n):
-        self.__text = "".join([self.__chars[(self.__chars.index(char)+n) % len(self.__chars)]
-            for char in self.__text])
+        self.__text = [self.__chars[(self.__chars.index(char)+n) % len(self.__chars)]
+            for char in self.__text]
 
     def ngrams(self, n, overlap=True):
         return ngrams(self.__repr__(), n, overlap=overlap)
+
+    def copy(self):
+        return Text(self.__repr__())
+
+    @property
+    def chars(self):
+        return self.__chars
