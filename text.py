@@ -41,14 +41,14 @@ class Text:
 
     def __getitem__(self, key):
         if isinstance(key, int) or isinstance(key, slice):
-            return self.__text[key]
+            return "".join(self.__text[key])
         else:
             raise TypeError("{} indices must be integers or slices, not {}"
                 .format(self.__class__.__name__, key.__class__.__name__))
 
     def __setitem__(self, key, value):
         if isinstance(key, str):
-            for i, char in self.__text:
+            for i, char in enumerate(self.__text):
                 if char == key:
                     self.__text[i] = value
                 elif char == value:
