@@ -1,13 +1,14 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+import webbrowser
 from text import Text
 
 class Challenge:
-    generic_url = "https://www.cipherchallenge.org/challenges/challenge-{}/"
+    __generic_url = "https://www.cipherchallenge.org/challenges/challenge-{}/"
 
     def __init__(self, n):
         self.__n = n
-        self.__url = self.generic_url.format(n)
+        self.__url = self.__generic_url.format(n)
         html = urlopen(self.__url)
         self.__soup = BeautifulSoup(html, "html.parser")
 
@@ -24,16 +25,19 @@ class Challenge:
         else:
             raise StopIteration
 
+    def open(self):
+        webbrowser.open(self.__url)
+
     @property
     def url(self):
         return self.__url
 
     @property
     def A(self):
-        content = soup.find_all("div", attrs={"class": "challenge__content"})
-        return Text(content[0].text.strip())
+        content = self.__soup.find_all("div", attrs={"class": "challenge__content"})
+        return Text(content[0].text.strip().replace("\n", "\n\n"))
 
     @property
     def B(self):
-        content = soup.find_all("div", attrs={"class": "challenge__content"})
-        return Text(content[1].text.strip())
+        content = self.__soup.find_all("div", attrs={"class": "challenge__content"})
+        return Text(content[1].text.strip().replace("\n", "\n\n"))

@@ -4,18 +4,20 @@ import pickle
 from collections import Counter
 from text import ngrams
 
-try:
-    path = os.path.expanduser("~\\Documents\\Cipher Challenge\\english_monograms.pkl")
-    with open(path, "rb") as f:
-        letter_freq = pickle.load(f)
-except:
-    letter_freq = {}
-    for char in string.ascii_uppercase:
-        letter_freq[char] = 1/26
+def uniform(chars):
+    dist = {}
+    n = len(chars)
+    for char in chars:
+        dist[char] = 1/n
+    return dist
 
 class Chi_Squared:
-    def __init__(self, expected=letter_freq):
-        self.__expected = expected
+    def __init__(self, expected=None, path=os.path.expanduser("~\\Documents\\Cipher Challenge\\Data\\english_monograms.pkl")):
+        if path != None:
+            with open(path, "rb") as f:
+                self.__expected = pickle.load(f)
+        else:
+            self.__expected = expected
 
     def score(self, text):
         observed = Counter(text)
@@ -28,10 +30,7 @@ class Chi_Squared:
 
 class Measure_Of_Roughness(Chi_Squared):
     def __init__(self, chars=string.ascii_uppercase):
-        self.__expected = {}
-        length = len(self.__char)
-        for char in self.__chars:
-            self.__expected[char] = 1/length
+        self.__expected = uniform(chars)
 
 class Index_Of_Coincidence:
     def __init__(self, chars=string.ascii_uppercase):
