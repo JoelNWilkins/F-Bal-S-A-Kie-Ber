@@ -1,6 +1,7 @@
 import string
 import os
 import pickle
+import math
 from collections import Counter
 from text import ngrams
 
@@ -13,7 +14,7 @@ def uniform(chars):
 
 class Chi_Squared:
     def __init__(self, expected=None, path=os.path.expanduser("~\\Documents\\Cipher Challenge\\Data\\english_monograms.pkl")):
-        if path != None:
+        if expected == None:
             with open(path, "rb") as f:
                 self.__expected = pickle.load(f)
         else:
@@ -30,7 +31,7 @@ class Chi_Squared:
 
 class Measure_Of_Roughness(Chi_Squared):
     def __init__(self, chars=string.ascii_uppercase):
-        self.__expected = uniform(chars)
+        Chi_Squared.__init__(self, expected=uniform(chars))
 
 class Index_Of_Coincidence:
     def __init__(self, chars=string.ascii_uppercase):
@@ -39,3 +40,20 @@ class Index_Of_Coincidence:
 
     def score(self, text):
         return self.__mr.score(text) + (1/len(self.__chars))
+
+class ngrams_Score:
+    def __init__(self, probs=None, path=os.path.expanduser("~\\Documents\\Cipher Challenge\\Data\\english_bigrams.pkl")):
+        if probs == None:
+            with open(path, "rb") as f:
+                self.__probs = pickle.load(f)
+        else:
+            self.__probs = probs
+
+    def score(self, text):
+        total = 0
+        for gram in ngrams(text, len(list(self.__probs.keys())[0])):
+            if gram in self.__probs:
+                total += math.log10(self.__probs[gram])
+            else:
+                total -= 5
+        return total

@@ -17,7 +17,8 @@ class Text:
         self.__case = case.lower()
 
         if path != None:
-            text = f.read()
+            with open(path, "r") as f:
+                text = f.read()
 
         if self.__case == "auto":
             if self.__chars == string.ascii_uppercase:
@@ -37,6 +38,9 @@ class Text:
         return "".join(self.__text)
 
     def __str__(self):
+        return self.__temp.format(*self.__text)
+
+    def format(self, text):
         return self.__temp.format(*self.__text)
 
     def __get__(self):
@@ -93,7 +97,7 @@ class Text:
         return ngrams(self.__repr__(), n, overlap=overlap)
 
     def copy(self):
-        return Text(self.__repr__())
+        return Text(self.__str__())
 
     def save(self, path):
         with open(path, "w") as f:
