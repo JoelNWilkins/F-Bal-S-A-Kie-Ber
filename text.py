@@ -41,7 +41,7 @@ class Text:
         return self.__temp.format(*self.__text)
 
     def format(self, text):
-        return self.__temp.format(*self.__text)
+        return self.__temp.format(*text)
 
     def __get__(self):
         return self.__repr__()

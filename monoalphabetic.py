@@ -1,3 +1,4 @@
+import random
 from score import *
 from text import *
 from scraper import *
@@ -55,9 +56,32 @@ class Affine:
                     scores[scorer.score(self.decode(a, 0))] = a
             return Shift(self.decode(scores[max(scores.keys())], 0)).decode()
 
-challenge3 = Challenge(3)
-ciphertext = challenge3.A.copy()
-shift = Shift(ciphertext)
-affine = Affine(ciphertext)
-print(shift.decode())
-print(affine.decode())
+def substitution(text):
+    ciphertext = text
+    chars = list(ciphertext.chars)
+    scorer = ngrams_Score()
+    best_score = float("-inf")
+    best_text = ciphertext.copy()
+    while True:
+        char1 = random.choice(chars)
+        char2 = random.choice(chars)
+        ciphertext[char1] = char2
+        for i, char in enumerate(chars):
+            if char == char1:
+                chars[i] = char2
+            elif char == char2:
+                chars[i] = char1
+        score = scorer.score(ciphertext)
+        if score > best_score:
+            best_score = score
+            best_text = ciphertext.copy()
+            best_alpha = chars[:]
+            print(repr(best_text)[:80])
+            print(chars)
+        else:
+            ciphertext[char1] = char2
+            for i, char in enumerate(chars):
+                if char == char1:
+                    chars[i] = char2
+                elif char == char2:
+                    chars[i] = char1
