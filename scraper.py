@@ -1,5 +1,5 @@
 from urllib.request import urlopen
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import webbrowser
 from text import Text
 
@@ -35,9 +35,11 @@ class Challenge:
     @property
     def A(self):
         content = self.__soup.find_all("div", attrs={"class": "challenge__content"})
-        return Text(content[0].text.strip().replace("\n", "\n\n"))
+        soup = BeautifulSoup(str(content[0]).split("<hr/>")[0], "html.parser")
+        return Text(soup.text.strip().replace("\n", "\n\n"))
 
     @property
     def B(self):
         content = self.__soup.find_all("div", attrs={"class": "challenge__content"})
-        return Text(content[1].text.strip().replace("\n", "\n\n"))
+        soup = BeautifulSoup(str(content[1]).split("<hr/>")[0], "html.parser")
+        return Text(soup.text.strip().replace("\n", "\n\n"))

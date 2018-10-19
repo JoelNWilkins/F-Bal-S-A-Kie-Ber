@@ -6,55 +6,53 @@ from scraper import *
 class Shift:
     def __init__(self, text):
         self.__text = text
+        self.__chars = self.__text.chars
+        self.__length = len(self.__chars)
 
     def encode(self, n):
-        text = self.__text.copy()
-        text.shift(n)
-        return text
+        text = [self.__chars[(self.__chars.index(char) + n) % self.__length]
+            for char in self.__text]
+        return Text(self.__text.format(text))
 
     def decode(self, n=None):
         if n != None:
-            text = self.__text.copy()
-            text.shift(len(self.__text.chars)-n)
-            return text
+            return self.encode(self.__length - n)
         else:
-            text = self.__text.copy()
             scorer = ngrams_Score()
             scores = {}
-            for i in range(1, len(self.__text.chars)):
-                text.shift(1)
-                scores[scorer.score(text)] = i
-            return self.decode(n=scores[max(scores.keys())]-1)
+            for i in range(1, len(self.__chars)):
+                scores[scorer.score(self.decode(i))] = i
+            return self.decode(scores[max(scores.keys())])
 
 class Affine:
     def __init__(self, text):
         self.__text = text
+        self.__chars = self.__text.chars
+        self.__length = len(self.__chars)
 
     def encode(self, a, b):
-        m = len(self.__text.chars)
-        if math.gcd(a, m) != 1:
+        if math.gcd(a, self.__length) != 1:
             raise ValueError("a must be coprime to the number of characters")
-        text = [self.__text.chars[(self.__text.chars.index(char)*a+b) % m] for char in self.__text]
+        text = [self.__chars[(a*self.__chars.index(char) + b) % self.__length]
+            for char in self.__text]
         return Text(self.__text.format(text))
 
     def decode(self, a=None, b=None):
         if a != None and b != None:
-            m = len(self.__text.chars)
-            if math.gcd(a, m) != 1:
+            if math.gcd(a, self.__length) != 1:
                 raise ValueError("a must be coprime to the number of characters")
-            for i in range(m):
-                if (a*i) % m == 1:
+            for i in range(self.__length):
+                if (a*i) % self.__length == 1:
                     break
-            return self.encode(i, m-b)
+            return self.encode(i, self.__length - b)
         else:
-            m = len(self.__text.chars)
-            text = self.__text.copy()
-            scorer = Index_Of_Coincidence(self.__text.chars)
+            scorer = ngrams_Score()
             scores = {}
-            for a in range(m):
-                if math.gcd(a, m) == 1:
-                    scores[scorer.score(self.decode(a, 0))] = a
-            return Shift(self.decode(scores[max(scores.keys())], 0)).decode()
+            for a in range(self.__length):
+                if math.gcd(a, self.__length) == 1:
+                    for b in range(self.__length):
+                        scores[scorer.score(self.decode(a, b))] = (a, b)
+            return self.decode(*scores[max(scores.keys())])
 
 def substitution(text):
     ciphertext = text

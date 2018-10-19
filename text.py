@@ -89,10 +89,6 @@ class Text:
         self.__text = sep.join(["".join(list(reversed(word)))
             for word in self.__repr__().split(sep)])
 
-    def shift(self, n):
-        self.__text = [self.__chars[(self.__chars.index(char)+n) % len(self.__chars)]
-            for char in self.__text]
-
     def ngrams(self, n, overlap=True):
         return ngrams(self.__repr__(), n, overlap=overlap)
 
@@ -106,3 +102,9 @@ class Text:
     @property
     def chars(self):
         return self.__chars
+
+    def encode(self, cipher, *args, **kwargs):
+        return cipher(self).encode(*args, **kwargs)
+
+    def decode(self, cipher, *args, **kwargs):
+        return cipher(self).decode(*args, **kwargs)
