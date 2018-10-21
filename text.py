@@ -1,5 +1,6 @@
 import string
 import re
+from itertools import count
 
 def ngrams(text, n, overlap=True):
     if len(text) < n:
@@ -81,6 +82,12 @@ class Text:
         else:
             raise StopIteration
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.__repr__() == repr(Text(other, chars=self.__chars))
+        elif isinstance(other, type(self)):
+            return self.__repr__() == other.__repr__()
+
     def reverse(self):
         # can also call reversed method with a Text object as an argument
         self.__text = list(reversed(self.__text))
@@ -99,12 +106,28 @@ class Text:
         with open(path, "w") as f:
             f.write(self.__str__())
 
-    @property
-    def chars(self):
-        return self.__chars
-
     def encode(self, cipher, *args, **kwargs):
         return cipher(self).encode(*args, **kwargs)
 
     def decode(self, cipher, *args, **kwargs):
         return cipher(self).decode(*args, **kwargs)
+
+    def section(self, n, i):
+        output = ""
+        length = len(self.__text)
+        for j in count(0):
+            if i+j*n < length:
+                output += self.__text[i+j*n]
+            else:
+                break
+        return Text(output)
+
+    def sections(self, n):
+        output = []
+        for i in range(n):
+            output.append(self.section(n, i))
+        return output
+
+    @property
+    def chars(self):
+        return self.__chars

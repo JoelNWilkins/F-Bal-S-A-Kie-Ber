@@ -29,6 +29,9 @@ class Chi_Squared:
             total += (observed[char] - expected)**2 / expected
         return total / length
 
+    def best(self, scores, rank=1):
+        return scores[sorted(scores.keys())[rank-1]]
+
 class Measure_Of_Roughness(Chi_Squared):
     def __init__(self, chars=string.ascii_uppercase):
         Chi_Squared.__init__(self, expected=uniform(chars))
@@ -36,13 +39,18 @@ class Measure_Of_Roughness(Chi_Squared):
 class Index_Of_Coincidence:
     def __init__(self, chars=string.ascii_uppercase):
         self.__chars = chars
-        self.__mr = Measure_Of_Roughness(chars=self.__chars)
 
     def score(self, text):
-        return self.__mr.score(text) + (1/len(self.__chars))
+        freq = Counter(text)
+        length = len(text)
+        total = sum([freq[char]*(freq[char] - 1) for char in freq.keys()])
+        return total / (length*(length - 1))
+
+    def best(self, scores, rank=1):
+        return scores[sorted(scores.keys())[len(scores)-rank]]
 
 class ngrams_Score:
-    def __init__(self, probs=None, path=os.path.expanduser("~\\Documents\\Cipher Challenge\\Data\\english_bigrams.pkl")):
+    def __init__(self, probs=None, path=os.path.expanduser("~\\Documents\\Cipher Challenge\\Data\\english_quadgrams.pkl")):
         if probs == None:
             with open(path, "rb") as f:
                 self.__probs = pickle.load(f)
@@ -56,4 +64,7 @@ class ngrams_Score:
                 total += math.log10(self.__probs[gram])
             else:
                 total -= 5
-        return total
+        return total / len(text)
+
+    def best(self, scores, rank=1):
+        return scores[sorted(scores.keys())[len(scores)-rank]]
