@@ -19,7 +19,7 @@ class Shift:
             return self.encode(self.__length - n)
         else:
             scores = {}
-            for i in range(1, len(self.__chars)):
+            for i in range(1, self.__length):
                 scores[self.__scorer.score(self.decode(i))] = i
             return self.decode(self.__scorer.best(scores))
 

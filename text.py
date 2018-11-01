@@ -1,5 +1,6 @@
 import string
 import re
+import math
 from itertools import count
 
 def ngrams(text, n, overlap=True):
@@ -11,6 +12,8 @@ def ngrams(text, n, overlap=True):
     elif not overlap:
         for i in range(int(len(text)//n)):
             yield text[i*n:(i+1)*n]
+        if len(text) % n != 0:
+            yield text[(i+1)*n:]
 
 class Text:
     def __init__(self, text=None, chars=string.ascii_uppercase, case="auto", path=None):

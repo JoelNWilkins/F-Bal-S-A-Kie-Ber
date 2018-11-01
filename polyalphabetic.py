@@ -64,9 +64,3 @@ class Vigenere:
                 for i in range(n)]) / length
             scores[score] = n
         return scorer.best(scores)
-
-ciphertext = Text(path="C:/Users/joeln/Documents/Cipher Challenge/Challenges/2017/challenge-1a-question.txt")
-plaintext = ciphertext.decode(Shift)
-ciphertext = plaintext.encode(Vigenere, "HI")
-print(Vigenere(ciphertext).period())
-print(str(ciphertext.decode(Vigenere, n=2, brute_force=True)))
