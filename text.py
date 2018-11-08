@@ -96,8 +96,8 @@ class Text:
         self.__text = list(reversed(self.__text))
 
     def reverse_words(self, sep=" "):
-        self.__text = sep.join(["".join(list(reversed(word)))
-            for word in self.__repr__().split(sep)])
+        self.__text = list(sep.join(["".join(list(reversed(word)))
+            for word in self.__repr__().split(sep)]))
 
     def ngrams(self, n, overlap=True):
         return ngrams(self.__repr__(), n, overlap=overlap)

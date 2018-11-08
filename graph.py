@@ -82,7 +82,3 @@ def plot_sections_ic(text, start=1, stop=20, width=1, fig=plt):
             hatch="////", width=width)
     fig.xticks(list(range(start, stop+1)), list(range(start, stop+1)))
     return fig
-
-ciphertext = Text(path="Challenges/2018/challenge-2b-question.txt")
-plot_letter_freq(ciphertext, width=0.6, show_expected=False, show_average=True, reorder=True).show()
-plot_sections_ic(ciphertext, width=0.6).show()
