@@ -1,3 +1,4 @@
+import math
 from score import *
 from text import *
 from matrix import Matrix
@@ -19,5 +20,28 @@ class Hill:
             output += "".join([self.__chars[i] for i in ciphertext.column(0)])
         return Text(self.__text.format(list(output)), chars=self.__chars)
 
-    def decode(self, key):
-        return self.encode(key.mod_inv(self.__length))
+    def decode(self, key=None, crib=None, n=None):
+        if isinstance(key, Matrix):
+            return self.encode(key.mod_inv(self.__length))
+        else:
+            if n == None and crib != None:
+                n = int(math.floor((len(crib) + 1.25)**0.5 - 0.5))
+            crib_keys = [Matrix([[self.__chars.index(crib[i+n*j+k]) for j in range(n)]
+                for i in range(n)]) for k in range(n)]
+            scorer = ngrams_Score()
+            best_score = -float("inf")
+            best_text = self.__text.copy()
+            for k in range(len(self.__text)-n+1):
+                try:
+                    if isinstance(crib_keys[k%n], Matrix):
+                        cipher_matrix = Matrix([[self.__chars.index(self.__text[i+n*j+n*((k+n-1)//n)])
+                            for j in range(n)] for i in range(n)]).mod_inv(self.__length)
+                        key = (crib_keys[k%n]*cipher_matrix) % self.__length
+                        attempt = self.encode(key)
+                        score = scorer.score(attempt)
+                        if score > best_score:
+                            best_score = score
+                            best_text = attempt.copy()
+                except:
+                    pass
+            return best_text
