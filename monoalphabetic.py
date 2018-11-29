@@ -21,6 +21,7 @@ class Shift:
             scores = {}
             for i in range(1, self.__length):
                 scores[self.__scorer.score(self.decode(i))] = i
+            print(self.__scorer.best(scores))
             return self.decode(self.__scorer.best(scores))
 
 class Affine:

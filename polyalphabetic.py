@@ -19,13 +19,15 @@ class Vigenere:
     def decode(self, key=None, n=None, brute_force=False):
         if key != None:
             n = len(key)
-            inverse = "".join([self.__chars[self.__length - self.__chars.index(char) - 1]
-                for char in key])
-            return self.encode(inverse)
+            output = [Shift(self.__text.section(n, i)).decode(self.__chars.index(key[i]))
+                for i in range(n)]
+            text = [output[i % n][i // n] for i in range(len(self.__text))]
+            return Text(self.__text.format(text), chars=self.__chars)
         else:
             if not brute_force:
                 if n == None:
                     n = self.period()
+                    print(n)
                 output = [Shift(self.__text.section(n, i), scorer=self.__scorer).decode()
                     for i in range(n)]
                 text = [output[i % n][i // n] for i in range(len(self.__text))]
@@ -33,6 +35,7 @@ class Vigenere:
             else:
                 if n == None:
                     n = self.period()
+                    print(n)
                 scorer = ngrams_Score()
                 best_text = self.__text.copy()
                 best_score = scorer.score(best_text)
@@ -53,6 +56,7 @@ class Vigenere:
                     if scorer.best({score: text, best_score: best_text}) == text:
                         best_score = score
                         best_text = text.copy()
+                        print(best_text)
                 return best_text
 
     def period(self, start=1, stop=20):
